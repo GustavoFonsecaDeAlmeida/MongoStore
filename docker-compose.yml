@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  mongostoreapi:
+    image: mongostoreapi
+    build:
+      context: ./MongoStoreAPI
+      dockerfile: Dockerfile
