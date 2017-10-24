@@ -12,11 +12,12 @@ namespace MongoStoreAPI.Models.Data
     public class DataAccess
     {
         private readonly IMongoDatabase _mongoDatabase;
-        
+        private IMongoCollection<Products> ProductsCollection;
         public DataAccess()
         {
-            var mongoClient = new MongoClient("mongodb://localhost:27017");
-            _mongoDatabase = mongoClient.GetDatabase("ProductsDb");
+            var mongoClient = new MongoClient("mongodb://gustavofalmeida:123456@ds231715.mlab.com:31715/productsdb");
+            _mongoDatabase = mongoClient.GetDatabase("productsdb");
+            ProductsCollection = _mongoDatabase.GetCollection<Products>("Products");
         }
 
         //Create
@@ -29,15 +30,27 @@ namespace MongoStoreAPI.Models.Data
         //Read
         public IEnumerable<Products> GetProducts()
         {
-            return _mongoDatabase.GetCollection<Products>("Products").Find(FilterDefinition<Products>.Empty).ToList();
+            var x = _mongoDatabase.GetCollection<Products>("Products").Find(FilterDefinition<Products>.Empty).ToList();
+            return x;
         }
 
-        public List<Products>  GetProductsPaged(int page , int pageCount , out int totalEntitys ,out int totalPages, out int nextPage)
+        public List<Products> GetProductsPaged(int page, int pageCount, out int totalEntitys, out int totalPages, out int nextPage)
         {
             var query = _mongoDatabase.GetCollection<Products>("Products").Find(FilterDefinition<Products>.Empty).ToList();
             totalEntitys = query.Count();
             totalPages = totalEntitys / pageCount;
-            nextPage = page < totalPages ?  page + 1 : 0;  
+            nextPage = page < totalPages ? page + 1 : 0;
+            return query.Skip(page * pageCount).SkipLast(pageCount).ToList();
+
+        }
+
+        public List<Products> GetProductsPagedFilteredByBrand(int page, int pageCount, string propValue, out int totalEntitys, out int totalPages, out int nextPage)
+        {
+            var filter = Builders<Products>.Filter.Eq(Products => Products.Brand, propValue);
+            var query = _mongoDatabase.GetCollection<Products>("Products").Find(filter).ToList();
+            totalEntitys = query.Count();
+            totalPages = totalEntitys / pageCount;
+            nextPage = page < totalPages ? page + 1 : 0;
 
             return query.Skip(page * pageCount).SkipLast(pageCount).ToList();
 
