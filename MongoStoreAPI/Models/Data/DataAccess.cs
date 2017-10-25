@@ -28,9 +28,10 @@ namespace MongoStoreAPI.Models.Data
         }
 
         //Read
-        public IEnumerable<Products> GetProducts()
+        public List<Products> GetProducts()
         {
             var x = _mongoDatabase.GetCollection<Products>("Products").Find(FilterDefinition<Products>.Empty).ToList();
+            x = x.ToList();
             return x;
         }
 
@@ -44,15 +45,15 @@ namespace MongoStoreAPI.Models.Data
             
         }
 
-        public List<Products> GetProductsPagedFilteredByBrand(int page, int pageCount, string propValue, out int totalEntitys, out int totalPages, out int nextPage)
+        public List<Products> GetProductsPagedFilteredByBrand(int page, int pageobjectcount, string propValue, out int totalEntitys, out int totalPages, out int nextPage)
         {
             var filter = Builders<Products>.Filter.Eq(Products => Products.Brand, propValue);
             var query = _mongoDatabase.GetCollection<Products>("Products").Find(filter).ToList();
             totalEntitys = query.Count();
-            totalPages = totalEntitys / pageCount;
+            totalPages = totalEntitys / pageobjectcount;
             nextPage = page < totalPages ? page + 1 : 0;
 
-            return query.Skip((page - 1) * pageCount).Take(pageCount).ToList();
+            return query.Skip((page - 1) * pageobjectcount).Take(pageobjectcount).ToList();
 
         }
 

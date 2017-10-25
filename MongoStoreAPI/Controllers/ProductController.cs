@@ -21,14 +21,6 @@ namespace MongoStoreAPI.Controllers
         {
             ctx = _ctx;
         }
-        //// GET: api/Product
-        //[HttpGet]
-
-        //public IEnumerable<Products> Get()
-        //{
-        //    var x =  ctx.GetProducts();
-        //    return x ;
-        //}
 
         // GET: api/Product
         [HttpGet]
@@ -96,12 +88,12 @@ namespace MongoStoreAPI.Controllers
         }
 
         [HttpGet("pagedAndFilterByBrand")]
-        // GET: api/Product/pagedAndFilterByBrand?page=x&pagecount=y&brand=z
-        public JsonResult Get(int page, int pageCount , string brand)
+        // GET: api/Product/pagedAndFilterByBrand?page=x&pageobjectcount=y&brand=z
+        public JsonResult Get(int page, int pageobjectcount , string brand)
         {
          
 
-            if (pageCount > 5)
+            if (pageobjectcount > 5)
             {
                 return Json("A Pagecount cant exceed 5");
             }
@@ -109,20 +101,20 @@ namespace MongoStoreAPI.Controllers
             {
                 return Json("The Page number cant be 0 ");
             }
-            var x = ctx.GetProductsPagedFilteredByBrand(page, pageCount, brand, out var totalEntitys, out var totalPages, out var nextPage);
+            var x = ctx.GetProductsPagedFilteredByBrand(page, pageobjectcount, brand, out var totalEntitys, out var totalPages, out var nextPage);
 
             if (x != null)
             {
                 Request.HttpContext.Response.Headers.Add("X-Total-Count", totalEntitys.ToString());
                 Request.HttpContext.Response.Headers.Add("X-Total-Pages", totalPages.ToString());
 
-                if (pageCount == 0)
+                if (nextPage == 0)
                 {
-                    Request.HttpContext.Response.Headers.Add("X-Total-Pages", "Last Page");
+                    Request.HttpContext.Response.Headers.Add("X-Next-Pages", "Last Page");
                 }
                 else
                 {
-                    Request.HttpContext.Response.Headers.Add("X-Total-Pages", nextPage.ToString());
+                    Request.HttpContext.Response.Headers.Add("X-Next-Pages", nextPage.ToString());
                 }
                 return Json(Ok(x));
             }
