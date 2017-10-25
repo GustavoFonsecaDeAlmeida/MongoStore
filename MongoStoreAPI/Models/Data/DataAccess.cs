@@ -40,8 +40,8 @@ namespace MongoStoreAPI.Models.Data
             totalEntitys = query.Count();
             totalPages = totalEntitys / pageCount;
             nextPage = page < totalPages ? page + 1 : 0;
-            return query.Skip(page * pageCount).SkipLast(pageCount).ToList();
-
+            return query.Skip((page - 1)*pageCount).Take(pageCount).ToList();
+            
         }
 
         public List<Products> GetProductsPagedFilteredByBrand(int page, int pageCount, string propValue, out int totalEntitys, out int totalPages, out int nextPage)
@@ -52,7 +52,7 @@ namespace MongoStoreAPI.Models.Data
             totalPages = totalEntitys / pageCount;
             nextPage = page < totalPages ? page + 1 : 0;
 
-            return query.Skip(page * pageCount).SkipLast(pageCount).ToList();
+            return query.Skip((page - 1) * pageCount).Take(pageCount).ToList();
 
         }
 

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using MongoStoreAPI.Models.Data;
 using MongoStoreAPI.Models;
 using MongoDB.Bson;
+using Newtonsoft.Json;
 
 namespace MongoStoreAPI.Controllers
 {
@@ -20,14 +21,25 @@ namespace MongoStoreAPI.Controllers
         {
             ctx = _ctx;
         }
+        //// GET: api/Product
+        //[HttpGet]
+
+        //public IEnumerable<Products> Get()
+        //{
+        //    var x =  ctx.GetProducts();
+        //    return x ;
+        //}
+
         // GET: api/Product
         [HttpGet]
-        
-        public JsonResult  Get()
+
+        public JsonResult Get()
         {
-            var x =  ctx.GetProducts();
+            var x = ctx.GetProducts();
             return Json(Ok(x));
         }
+
+
 
         // GET: api/Product/5
         [HttpGet("{id}", Name = "Get")]
@@ -49,9 +61,7 @@ namespace MongoStoreAPI.Controllers
         // GET: api/Product/paged?page=x&pagecount=y
         public JsonResult Get(int page , int pageCount)
         {
-            int totalEntitys = 0 ;
-            int totalPages = 0;
-            int nextPage = 0;
+       
 
             if (pageCount > 5)
             {
@@ -61,20 +71,20 @@ namespace MongoStoreAPI.Controllers
             {
                 return Json("The Page number cant be 0 ");
             }
-            var x = ctx.GetProductsPaged(page , pageCount , out totalEntitys, out totalPages, out nextPage);
+            var x = ctx.GetProductsPaged(page , pageCount , out var totalEntitys, out var totalPages, out var nextPage);
 
             if (x != null)
             {
                 Request.HttpContext.Response.Headers.Add("X-Total-Count", totalEntitys.ToString());
                 Request.HttpContext.Response.Headers.Add("X-Total-Pages", totalPages.ToString());
 
-                if (pageCount == 0 )
+                if (nextPage == 0 )
                 {
-                    Request.HttpContext.Response.Headers.Add("X-Total-Pages", "Last Page");
+                    Request.HttpContext.Response.Headers.Add("X-Next-Page", "Last Page");
                 }
                 else
                 {
-                    Request.HttpContext.Response.Headers.Add("X-Total-Pages", nextPage.ToString());
+                    Request.HttpContext.Response.Headers.Add("X-Next-Page", nextPage.ToString());
                 }
                 return Json(Ok(x));
             }
@@ -89,9 +99,7 @@ namespace MongoStoreAPI.Controllers
         // GET: api/Product/pagedAndFilterByBrand?page=x&pagecount=y&brand=z
         public JsonResult Get(int page, int pageCount , string brand)
         {
-            int totalEntitys = 0;
-            int totalPages = 0;
-            int nextPage = 0;
+         
 
             if (pageCount > 5)
             {
@@ -101,7 +109,7 @@ namespace MongoStoreAPI.Controllers
             {
                 return Json("The Page number cant be 0 ");
             }
-            var x = ctx.GetProductsPagedFilteredByBrand(page, pageCount, brand, out totalEntitys, out totalPages, out nextPage);
+            var x = ctx.GetProductsPagedFilteredByBrand(page, pageCount, brand, out var totalEntitys, out var totalPages, out var nextPage);
 
             if (x != null)
             {
