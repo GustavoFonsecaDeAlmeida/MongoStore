@@ -3,7 +3,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using MongoStoreAPI.Helper;
-using MongoStoreAPI.Models.Data.Interface;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace MongoStoreAPI.Models.Data
 {
-    public class DataAccess : IDataAcess
+    public class DataAccess
     {
 
         private readonly IMongoDatabase _mongoDatabase;
