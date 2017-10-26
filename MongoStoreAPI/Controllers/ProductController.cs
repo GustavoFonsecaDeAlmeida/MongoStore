@@ -15,19 +15,19 @@ namespace MongoStoreAPI.Controllers
     [Route("api/Product")]
     public class ProductController : Controller
     {
-        private readonly DataAccess ctx;
+        private readonly DataAccess _ctx;
 
-        public ProductController(DataAccess _ctx)
+        public ProductController(DataAccess ctx)
         {
-            ctx = _ctx;
+            this._ctx = ctx;
         }
 
         // GET: api/Product
         [HttpGet]
 
-        public JsonResult Get()
+        public async Task<JsonResult> Get()
         {
-            var x = ctx.GetProducts();
+            var x = await _ctx.GetProducts();
             return Json(Ok(x));
         }
 
@@ -37,7 +37,7 @@ namespace MongoStoreAPI.Controllers
         [HttpGet("{id}", Name = "Get")]
         public JsonResult Get(int id)
         {
-            var x = ctx.GetProductsById(id);
+            var x = _ctx.GetProductsById(id);
             if (x != null)
             {
                 return Json(Ok(x));
@@ -63,7 +63,7 @@ namespace MongoStoreAPI.Controllers
             {
                 return Json("The Page number cant be 0 ");
             }
-            var x = ctx.GetProductsPaged(page , pageCount , out var totalEntitys, out var totalPages, out var nextPage);
+            var x = _ctx.GetProductsPaged(page , pageCount , out var totalEntitys, out var totalPages, out var nextPage);
 
             if (x != null)
             {
@@ -101,7 +101,7 @@ namespace MongoStoreAPI.Controllers
             {
                 return Json("The Page number cant be 0 ");
             }
-            var x = ctx.GetProductsPagedFilteredByBrand(page, pageobjectcount, brand, out var totalEntitys, out var totalPages, out var nextPage);
+            var x = _ctx.GetProductsPagedFilteredByBrand(page, pageobjectcount, brand, out var totalEntitys, out var totalPages, out var nextPage);
 
             if (x != null)
             {
@@ -129,23 +129,32 @@ namespace MongoStoreAPI.Controllers
         [HttpPost]
         public JsonResult Post([FromBody]Products prod)
         {
-           var x = ctx.AddProduct(prod);
-            if (x != null)
-            {
-                return Json(Ok(x));
+            var find = _ctx.GetProductsById(prod.ProductId);
 
+            if (find != null)
+            {
+                var x = _ctx.AddProduct(prod);
+                if (x != null)
+                {
+                    return Json(Ok(x));
+
+                }
+                else
+                {
+                    return Json("Ops.. Product cant be added");
+                }
             }
             else
             {
-                return Json("Ops.. Product cant be added");
-            }
+                return Json(StatusCode(409,"Product already exists in the database "));
+            } 
         }
         
         // PUT: api/Product/5
         [HttpPut("{id}")]
         public JsonResult Put(int id, [FromBody]Products prod)
         {
-            var x = ctx.UpdateProduct(id, prod);
+            var x = _ctx.UpdateProduct(id, prod);
 
             if (x)
             {
@@ -162,7 +171,7 @@ namespace MongoStoreAPI.Controllers
         [HttpDelete("{id}")]
         public JsonResult Delete(int id)
         {
-            var x = ctx.DeleteProduct(id);
+            var x = _ctx.DeleteProduct(id);
             if (x)
             {
                 return Json(Ok("Product Deleted"));

@@ -9,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoStoreAPI.Models.Data;
+using MongoStoreAPI.Helper;
+
 
 namespace MongoStoreAPI
 {
@@ -24,7 +26,7 @@ namespace MongoStoreAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            
+            services.Configure<MongoConfig>(Configuration.GetSection("MongoConfig"));
             services.AddTransient<DataAccess>();
             services.AddMvc();
         }

@@ -1,6 +1,9 @@
-﻿using MongoDB.Bson;
+﻿using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
+using MongoStoreAPI.Helper;
+using MongoStoreAPI.Models.Data.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,15 +12,25 @@ using System.Threading.Tasks;
 
 namespace MongoStoreAPI.Models.Data
 {
-    public class DataAccess
+    public class DataAccess : IDataAcess
     {
+
         private readonly IMongoDatabase _mongoDatabase;
         private IMongoCollection<Products> ProductsCollection;
+
         public DataAccess()
         {
-            var mongoClient = new MongoClient("mongodb://gustavofalmeida:123456@ds231715.mlab.com:31715/productsdb");
-            _mongoDatabase = mongoClient.GetDatabase("productsdb");
-            ProductsCollection = _mongoDatabase.GetCollection<Products>("Products");
+            try
+            {
+                var mongoClient = new MongoClient("mongodb://gustavofalmeida:123456@ds231715.mlab.com:31715/productsdb");
+                _mongoDatabase = mongoClient.GetDatabase("productsdb");
+                ProductsCollection = _mongoDatabase.GetCollection<Products>("Products");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Cant acess database", ex);
+            }
+
         }
 
         //Create
@@ -28,10 +41,9 @@ namespace MongoStoreAPI.Models.Data
         }
 
         //Read
-        public List<Products> GetProducts()
+        public async Task<List<Products>> GetProducts()
         {
-            var x = _mongoDatabase.GetCollection<Products>("Products").Find(FilterDefinition<Products>.Empty).ToList();
-            x = x.ToList();
+            var x = await _mongoDatabase.GetCollection<Products>("Products").Find(FilterDefinition<Products>.Empty).ToListAsync();
             return x;
         }
 
@@ -41,8 +53,8 @@ namespace MongoStoreAPI.Models.Data
             totalEntitys = query.Count();
             totalPages = totalEntitys / pageCount;
             nextPage = page < totalPages ? page + 1 : 0;
-            return query.Skip((page - 1)*pageCount).Take(pageCount).ToList();
-            
+            return query.Skip((page - 1) * pageCount).Take(pageCount).ToList();
+
         }
 
         public List<Products> GetProductsPagedFilteredByBrand(int page, int pageobjectcount, string propValue, out int totalEntitys, out int totalPages, out int nextPage)
