@@ -46,31 +46,31 @@ namespace MongoStoreAPI.Controllers
             {
                 return Json(NotFound("Ops..Product not found"));
             }
-            
+
         }
 
         [HttpGet("paged")]
         // GET: api/Product/paged?page=x&pagecount=y
-        public JsonResult Get(int page , int pageCount)
+        public JsonResult Get(int page, int pageCount)
         {
-       
+
 
             if (pageCount > 5)
             {
                 return Json("A Pagecount cant exceed 5");
             }
-            if (page <= 0 )
+            if (page <= 0)
             {
                 return Json("The Page number cant be 0 ");
             }
-            var x = _ctx.GetProductsPaged(page , pageCount , out var totalEntitys, out var totalPages, out var nextPage);
+            var x = _ctx.GetProductsPaged(page, pageCount, out var totalEntitys, out var totalPages, out var nextPage);
 
             if (x != null)
             {
                 Request.HttpContext.Response.Headers.Add("X-Total-Count", totalEntitys.ToString());
                 Request.HttpContext.Response.Headers.Add("X-Total-Pages", totalPages.ToString());
 
-                if (nextPage == 0 )
+                if (nextPage == 0)
                 {
                     Request.HttpContext.Response.Headers.Add("X-Next-Page", "Last Page");
                 }
@@ -89,10 +89,8 @@ namespace MongoStoreAPI.Controllers
 
         [HttpGet("pagedAndFilterByBrand")]
         // GET: api/Product/pagedAndFilterByBrand?page=x&pageobjectcount=y&brand=z
-        public JsonResult Get(int page, int pageobjectcount , string brand)
+        public JsonResult Get(int page, int pageobjectcount, string brand)
         {
-         
-
             if (pageobjectcount > 5)
             {
                 return Json("A Pagecount cant exceed 5");
@@ -146,10 +144,10 @@ namespace MongoStoreAPI.Controllers
             }
             else
             {
-                return Json(StatusCode(409,"Product already exists in the database "));
-            } 
+                return Json(StatusCode(409, "Product already exists in the database "));
+            }
         }
-        
+
         // PUT: api/Product/5
         [HttpPut("{id}")]
         public JsonResult Put(int id, [FromBody]Products prod)
@@ -164,9 +162,9 @@ namespace MongoStoreAPI.Controllers
             {
                 return Json("Ops.. Product cant be updated");
             }
-            
+
         }
-        
+
         // DELETE: api/Product/5
         [HttpDelete("{id}")]
         public JsonResult Delete(int id)

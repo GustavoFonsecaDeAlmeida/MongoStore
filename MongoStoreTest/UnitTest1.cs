@@ -32,13 +32,25 @@ namespace MongoStoreTest
             Assert.Equal(value, obj.ProductId);
         }
 
-        [Theory]
-        [InlineData(4)]
-        public async void GetAllProductsAndReturn4Objs(int value)
+        [Fact]
+        public async void GetAllProductsInsertOneAndVerifyIfHasPlusOne()
         {
             var obj = await _ctx.GetProducts();
-            var count = value;
-            Assert.Equal(value, obj.Count);
+            var count = obj.Count;
+
+            var prd = new Products();
+            prd.Brand = "Multilaser";
+            prd.Category = "Router";
+            prd.Description = "BF Router";
+            prd.ImageUrl = "ABC.COM/1223.PNG";
+            prd.ProductName = "MultilazerBfG";
+            prd.Id = ObjectId.GenerateNewId();
+            prd.ProductId = new Random().Next();
+            var CreateTest = _ctx.AddProduct(prd);
+
+            var objAfterCreate = await _ctx.GetProducts();
+            var countAfterCreate = objAfterCreate.Count;
+            Assert.Equal(count, countAfterCreate);
         }
 
         [Theory]
@@ -66,12 +78,30 @@ namespace MongoStoreTest
             prd.Id = ObjectId.GenerateNewId();
             prd.ProductId = new Random().Next();
             var CreateProductReturn = _ctx.AddProduct(prd);
-            
+
             Assert.Equal(prd.ProductName, CreateProductReturn.ProductName);
             Assert.Equal(prd.Id, CreateProductReturn.Id);
 
         }
 
+        [Fact]
+        public void DeleteObjTest()
+        {
+            var prd = new Products();
+            prd.Brand = "Multilaser";
+            prd.Category = "RouterABC";
+            prd.Description = "BF RouterABC";
+            prd.ImageUrl = "ABC.COM/1223.PNG";
+            prd.ProductName = "MultilazerBfG";
+            prd.Id = ObjectId.GenerateNewId();
+            prd.ProductId = new Random().Next();
+            var CreateProductReturn = _ctx.AddProduct(prd);
+            _ctx.DeleteProduct(prd.ProductId);
+            var objReturn = _ctx.GetProductsById(prd.ProductId);
+
+            Assert.Null(objReturn);
+
+        }
 
 
 
